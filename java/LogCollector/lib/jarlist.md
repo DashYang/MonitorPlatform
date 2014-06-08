@@ -1,0 +1,4 @@
+jar list
+===================
+- log4j-1.2.16.jar
+- mysql-connector-java-5.1.27-bin.jar
