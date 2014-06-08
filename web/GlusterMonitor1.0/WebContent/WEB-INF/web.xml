@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" id="WebApp_ID" version="2.5">
+  <display-name>GlusterMonitor1.0</display-name>
+  <!-- 配置struts2资源 -->
+  <filter>
+    <filter-name>struts2</filter-name>
+    <filter-class>org.apache.struts2.dispatcher.ng.filter.StrutsPrepareAndExecuteFilter</filter-class>
+    <init-param>
+      <param-name>config</param-name>
+      <param-value>struts-default.xml,struts-plugin.xml,struts.xml</param-value>
+    </init-param>
+  </filter>
+  <filter-mapping>
+    <filter-name>struts2</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+  <!-- 配置spring 资源 -->
+  <listener>
+    <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+  </listener>
+  <context-param>
+    <param-name>contextConfigLocation</param-name>
+    <param-value>classpath:applicationContext-*.xml</param-value>
+  </context-param>
+  <welcome-file-list>
+    <welcome-file>/zero/index.jsp</welcome-file>
+  </welcome-file-list>
+  <!--  spring过滤器 -->
+  <filter>
+    <display-name>LevelOneFilter</display-name>
+    <filter-name>LevelOneFilter</filter-name>
+    <filter-class>spring.filter.LevelOneFilter</filter-class>
+  </filter>
+  <filter>
+    <display-name>LevelTwoFilter</display-name>
+    <filter-name>LevelTwoFilter</filter-name>
+    <filter-class>spring.filter.LevelTwoFilter</filter-class>
+  </filter>
+  <filter-mapping>
+    <filter-name>LevelTwoFilter</filter-name>
+    <url-pattern>/five/*</url-pattern>
+  </filter-mapping>
+  <filter-mapping>
+    <filter-name>LevelOneFilter</filter-name>
+    <url-pattern>/one/*</url-pattern>
+  </filter-mapping>
+</web-app>

@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+
+<struts>
+	<!-- 将Action的创建交给spring来管理 -->
+	<constant name="struts.objectFactory" value="spring" />
+	<package name="loginAction" namespace="/" extends="struts-default">
+		<action name="login" method="login" class="loginAction">
+			<result name="success">/one/info.jsp</result>
+			<result name="failed">/zero/index.jsp</result>
+		</action>
+	</package>
+	<package name="logoutAction" namespace="/" extends="struts-default">
+		<action name="logout" method="logout" class="loginAction">
+			<result name="success">/zero/index.jsp</result>
+			<result name="failed">/one/info.jsp</result>
+		</action>
+	</package>
+	<package name="userManage" namespace="/" extends="struts-default">
+		<action name="usermanageinit" method="init" class="usermanageAction">
+			<result name="success">/five/usermanage.jsp</result>
+			<result name="failed">/one/info.jsp</result>
+		</action>
+		<action name="deleteUser" method="deleteUser" class="usermanageAction">
+			<result name="success">/five/usermanage.jsp</result>
+		</action>
+		<action name="addUser" method="addUser" class="usermanageAction">
+			<result name="success">/five/usermanage.jsp</result>
+		</action>
+	</package>
+	<package name="siteManage" namespace="/" extends="struts-default">
+		<action name="addSite" method="addSite" class="sitemanageAction">
+			<result name="success">/five/sitemanage.jsp</result>
+			<result name="failed">/five/sitemanage.jsp</result>
+		</action>
+		<action name="deleteSite" method="deleteSite" class="sitemanageAction">
+			<result name="success">/five/sitemanage.jsp</result>
+		</action>
+	</package>
+	<package name="routeManage" namespace="/" extends="struts-default">
+		<action name="toInfo" method="toInfojsp" class="maprouteAction">
+			<result name="success">/one/info.jsp</result>
+		</action>
+		<action name="toUsermanage" method="init" class="usermanageAction">
+			<result name="success">/five/usermanage.jsp</result>
+			<result name="fail">/zero/warning.jsp</result>
+		</action>
+		<action name="toSitemanage" method="init" class="sitemanageAction">
+			<result name="success">/five/sitemanage.jsp</result>
+			<result name="fail">/zero/warning.jsp</result>
+		</action>
+		<action name="getLogs" method="init" class="logsmanageAction">
+			<result name="success">/one/remotelog.jsp</result>
+		</action>
+	</package>
+	<package name="remoteNodemange" namespace="/" extends="struts-default">
+		<action name="getInfo" method="getInfo" class="remoteNodeAction">
+			<result name="success">/one/remotenode.jsp</result>
+		</action>
+	</package>
+	<package name="AjaxRequestmanage" extends="struts-default,json-default">
+		<action name="getVolumestatus" method="getVolumestatus" class="AjaxHandlerAction">
+			<result name="fail"></result>
+			<!-- 返回json类型数据 -->
+			<result name="success" type="json">
+				<param name="root">result<!-- result是action中设置的变量名，也是页面需要返回的数据，该变量必须有setter和getter方法 --></param>
+			</result>
+		</action>
+		
+		<action name="getVolumeinfo" method="getVolumeinfo" class="AjaxHandlerAction">
+			<result name="fail"></result>
+			<!-- 返回json类型数据 -->
+			<result name="success" type="json">
+				<param name="root">result<!-- result是action中设置的变量名，也是页面需要返回的数据，该变量必须有setter和getter方法 --></param>
+			</result>
+		</action>
+		
+		<action name="getPeerinfo" method="getPeerinfo" class="AjaxHandlerAction">
+			<result name="fail"></result>
+			<!-- 返回json类型数据 -->
+			<result name="success" type="json">
+				<param name="root">result<!-- result是action中设置的变量名，也是页面需要返回的数据，该变量必须有setter和getter方法 --></param>
+			</result>
+		</action>
+		
+		<action name="getSambaInfo" method="getSambaInfo" class="AjaxHandlerAction">
+			<result name="fail"></result>
+			<!-- 返回json类型数据 -->
+			<result name="success" type="json">
+				<param name="root">result<!-- result是action中设置的变量名，也是页面需要返回的数据，该变量必须有setter和getter方法 --></param>
+			</result>
+		</action>
+		
+		<action name="getLineinfo" method="getLineinfo"	class="AjaxHandlerAction">
+			<result name="fail"></result>
+			<!-- 返回json类型数据 -->
+			<result name="success" type="json">
+				<param name="root">result<!-- result是action中设置的变量名，也是页面需要返回的数据，该变量必须有setter和getter方法 --></param>
+			</result>
+		</action>
+		<action name="getCurrentLineinfo" method="getCurrentLineinfo"	class="AjaxHandlerAction">
+			<result name="fail"></result>
+			<!-- 返回json类型数据 -->
+			<result name="success" type="json">
+				<param name="root">result<!-- result是action中设置的变量名，也是页面需要返回的数据，该变量必须有setter和getter方法 --></param>
+			</result>
+		</action>
+		<action name="getResultofCommand" method="getResultofCommand"	class="AjaxHandlerAction">
+			<result name="fail"></result>
+			<!-- 返回json类型数据 -->
+			<result name="success" type="json">
+				<param name="root">result<!-- result是action中设置的变量名，也是页面需要返回的数据，该变量必须有setter和getter方法 --></param>
+			</result>
+		</action>
+		<action name="getSiteinfo" method="getSiteinfo"	class="AjaxHandlerAction">
+			<result name="fail"></result>
+			<!-- 返回json类型数据 -->
+			<result name="success" type="json">
+				<param name="root">result<!-- result是action中设置的变量名，也是页面需要返回的数据，该变量必须有setter和getter方法 --></param>
+			</result>
+		</action>
+		<action name="getResultOfLogs" method="getResultOfLogs"	class="AjaxHandlerAction">
+			<result name="fail"></result>
+			<!-- 返回json类型数据 -->
+			<result name="success" type="json">
+				<param name="root">result<!-- result是action中设置的变量名，也是页面需要返回的数据，该变量必须有setter和getter方法 --></param>
+			</result>
+		</action>
+	</package>
+	
+	<package name="CommandManange" extends="struts-default,json-default">
+		<action name="mountVolume" method="mountVolume" class="CommandHandlerAction">
+			<result name="fail"></result>
+			<!-- 返回json类型数据 -->
+			<result name="success" type="json">
+				<param name="root">result<!-- result是action中设置的变量名，也是页面需要返回的数据，该变量必须有setter和getter方法 --></param>
+			</result>
+		</action>
+		
+		<action name="umountVolume" method="umountVolume" class="CommandHandlerAction">
+			<result name="fail"></result>
+			<!-- 返回json类型数据 -->
+			<result name="success" type="json">
+				<param name="root">result<!-- result是action中设置的变量名，也是页面需要返回的数据，该变量必须有setter和getter方法 --></param>
+			</result>
+		</action>
+		
+		<action name="changeVolumeStatus" method="changeVolumeStatus" class="CommandHandlerAction">
+			<result name="fail"></result>
+			<!-- 返回json类型数据 -->
+			<result name="success" type="json">
+				<param name="root">result<!-- result是action中设置的变量名，也是页面需要返回的数据，该变量必须有setter和getter方法 --></param>
+			</result>
+		</action>
+		
+		<action name="editNodeStatus" method="editNodeStatus" class="CommandHandlerAction">
+			<result name="fail"></result>
+			<!-- 返回json类型数据 -->
+			<result name="success" type="json">
+				<param name="root">result<!-- result是action中设置的变量名，也是页面需要返回的数据，该变量必须有setter和getter方法 --></param>
+			</result>
+		</action>
+		
+		<action name="getBriefOfSambaInfo" method="getBriefOfSambaInfo" class="CommandHandlerAction">
+			<result name="fail"></result>
+			<!-- 返回json类型数据 -->
+			<result name="success" type="json">
+				<param name="root">result<!-- result是action中设置的变量名，也是页面需要返回的数据，该变量必须有setter和getter方法 --></param>
+			</result>
+		</action>
+		
+		<action name="editSambaFolder" method="editSambaFolder" class="CommandHandlerAction">
+			<result name="fail"></result>
+			<!-- 返回json类型数据 -->
+			<result name="success" type="json">
+				<param name="root">result<!-- result是action中设置的变量名，也是页面需要返回的数据，该变量必须有setter和getter方法 --></param>
+			</result>
+		</action>
+		
+		<action name="editSambaUser" method="editSambaUser" class="CommandHandlerAction">
+			<result name="fail"></result>
+			<!-- 返回json类型数据 -->
+			<result name="success" type="json">
+				<param name="root">result<!-- result是action中设置的变量名，也是页面需要返回的数据，该变量必须有setter和getter方法 --></param>
+			</result>
+		</action>
+		
+	</package>
+</struts>

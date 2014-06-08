@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!-- Generated Apr 10, 2014 3:52:03 PM by Hibernate Tools 3.4.0.CR1 -->
+<hibernate-mapping>
+    <class name="hibernate.pojo.GmStatus" table="gm_status" catalog="GlusterMonitor">
+        <composite-id name="id" class="hibernate.pojo.GmStatusId">
+            <key-property name="id" type="timestamp">
+                <column name="id" length="19" />
+            </key-property>
+            <key-property name="hostname" type="string">
+                <column name="hostname" length="20" />
+            </key-property>
+        </composite-id>
+        <property name="ipofib" type="string">
+            <column name="ipofib" length="16" not-null="true" />
+        </property>
+        <property name="cpuuseratio" type="double">
+            <column name="cpuuseratio" precision="22" scale="0" not-null="true" />
+        </property>
+        <property name="memtotal" type="int">
+            <column name="memtotal" not-null="true" />
+        </property>
+        <property name="usedmem" type="int">
+            <column name="usedmem" not-null="true" />
+        </property>
+        <property name="netsendflow" type="int">
+            <column name="netsendflow" not-null="true" />
+        </property>
+        <property name="netreceiveflow" type="int">
+            <column name="netreceiveflow" not-null="true" />
+        </property>
+        <property name="ibsendflow" type="int">
+            <column name="ibsendflow" not-null="true" />
+        </property>
+        <property name="ibreceiveflow" type="int">
+            <column name="ibreceiveflow" not-null="true" />
+        </property>
+    </class>
+</hibernate-mapping>
