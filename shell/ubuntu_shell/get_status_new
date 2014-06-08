@@ -1,0 +1,54 @@
+#!/bin/bash
+get_cpu_stat()
+{
+	awk -v total=0 '/cpu[^0-9]/ {for(i=2;i<=NF;i++){total+=$i};used=$2+$3+$4+$7+$8 }END{print total,used}' /proc/stat
+}
+
+get_mem_stat()
+{
+	awk '/MemTotal/{total=$2}/MemFree/{free=$2}/Buffers/{buffers=$2}/^Cached/{cached=$2}END{printf ("%d,%d",total,total-free-buffers-cached)}'  /proc/meminfo
+}
+
+get_net_stat()
+{
+	awk -F: '/eth[0-9]/ {print $2}' /proc/net/dev|awk '{net_rec+=$1;net_trans+=$9} END{print net_trans" "net_rec}'
+}
+
+if [ "`ps -ef|grep "get_status"|egrep -v "grep|vi"|wc -l`" -gt "1" ];then
+	while [ $(((`date +%s`)%5)) -ne "0" ]
+	do
+		sleep 1
+	done
+	time_point=`get_cpu_stat`
+	get_net_stat_point=(`get_net_stat`)
+	while [ 1 ]
+	do
+		sleep 5
+		mem_stat=`get_mem_stat`
+		time_point_2=`get_cpu_stat`
+		get_net_stat_point2=(`get_net_stat`)
+	#	echo "net1 ${get_net_stat_point2[0]}"
+	#	echo "net2 ${get_net_stat_point2[1]}"
+		net_out=$(((${get_net_stat_point2[0]}-${get_net_stat_point[0]})/5/1024))
+		net_in=$(((${get_net_stat_point2[1]}-${get_net_stat_point[1]})/5/1024))
+	#	echo "pre:$time_point now:$time_point_2"
+		cpu_stat=`echo "$time_point $time_point_2"|awk '{used=$4-$2;total=$3+$4-$1-$2;printf("%.2f\n",used*100/total)}'`
+		ib_out="0"
+		ib_in="0"
+		ipoib_ip="none"
+		get_net_stat_point=(${get_net_stat_point2[*]})
+		time_point=$time_point_2
+		hostname=`hostname`
+		var=`date +%F" "%T`
+		current_date=`echo $var|cut -c1-10`
+		if [ "`echo $var|cut -c19`" -ge 5 ];then
+			date="`echo $var|cut -c1-18`5"
+		else
+			date="`echo $var|cut -c1-18`0"
+		fi
+		sudo touch ./tmp/$current_date.stat
+		sudo chmod 777 ./tmp/$current_date.stat
+	#	echo "cpu:$cpu_stat"
+		echo "$date@$hostname,$ipoib_ip,$cpu_stat,$mem_stat,$net_out,$net_in,$ib_out,$ib_in" >> ./tmp/$current_date.stat
+	done
+fi

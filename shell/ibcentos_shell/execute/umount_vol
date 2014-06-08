@@ -1,0 +1,28 @@
+#!/bin/bash
+#umount vol_name
+
+mounted_vol=$1
+hostname=`hostname`    
+if [ -n "$mounted_vol" ];then
+            n=1
+            while [ $n -le 4 ]
+            do
+            n=$(($n+1))
+            umount "/gluster/$mounted_vol"
+            ret=$?
+                if [ $ret -eq "0" ];then
+                         break
+                fi
+		if [ $n -eq "3" ];then
+              		echo "umount $mounted_vol failed"
+              		exit 1
+           	fi
+                for i in `lsof|grep /gluster/$mounted_vol|awk '{print $2}' 2>/dev/null`
+                do
+                          kill -9 $i
+                done
+            done
+fi
+
+echo "umount done"
+

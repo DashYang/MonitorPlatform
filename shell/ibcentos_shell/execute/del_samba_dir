@@ -1,0 +1,10 @@
+#!/bin/bash
+dir=`echo "$1]"`
+localpath=/root/centos_shell/tmp
+if [ -n  "`grep $dir /etc/samba/smb.conf`" ];then
+	sudo touch "$localpath"/config/smb.conf.del
+	sudo chmod 777 "$localpath"/config/smb.conf.del
+	cat /etc/samba/smb.conf|sed  s'/^\[/\n\[/'g|awk -v RS="" '{if($0!~dir) print $0}' dir=$dir>>"$localpath"/config/smb.conf.del
+	echo y|sudo mv /etc/samba/smb.conf "$localpath"/config/smb.conf.bak
+	echo y|sudo mv "$localpath"/config/smb.conf.del /etc/samba/smb.conf
+fi

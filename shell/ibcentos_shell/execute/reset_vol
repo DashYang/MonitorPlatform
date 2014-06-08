@@ -1,0 +1,20 @@
+#!bin/sh
+#disvol
+if [ -z "`sh get_vol_info|grep disvol`" ];then
+	gluster volume create disvol transport tcp dash-Aspire-4741:/home/dash/glusterspace/distribute/ node00:/root/distribute
+	gluster volume start disvol
+fi
+
+#tcprepvol
+#if [ -z "`sh get_vol_info|grep tcprepvol`" ];then
+#	gluster volume create tcprepvol replica 2 transport tcp dash-Aspire-4741:/home/dash/glusterspace/tcprepvol/ node00:/root/tcprepvol
+#	gluster volume start tcprepvol
+#fi
+
+#myvol
+if [ -z "`sh ../search/get_vol_info|grep myvol`" ];then
+	gluster volume create myvol replica 2 transport tcp dash-Aspire-4741:/home/dash/glusterspace/replicate dash-Aspire-4741:/home/dash/glusterspace/distribute dash-Aspire-4741:/home/dash/glusterspace/stripe dash-Aspire-4741:/home/dash/glusterspace/tcprepvol
+	gluster volume start myvol
+fi
+
+echo "volume load done"

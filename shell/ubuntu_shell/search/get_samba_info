@@ -1,0 +1,31 @@
+#!/bin/bash
+for i in `cat /etc/samba/smb.conf|sed '/^#.*/'d|awk -v RS="[" '{print NR}'`
+do
+if [ -n "`cat /etc/samba/smb.conf |sed '/^#.*/'d|awk -v RS="[" -F= 'NR==num' num=$i`" -a -z "`cat /etc/samba/smb.conf|sed '/^#.*/'d|awk -v RS="[" -F= 'NR==num' num=$i|grep global`" -a -z "`cat /etc/samba/smb.conf|sed '/^#.*/'d|awk -v RS="[" -F= 'NR==num' num=$i|grep "homes]"`" ];then
+dir_name=`cat /etc/samba/smb.conf|sed '/^#.*/'d|awk -v RS="["  'NR==num {if($0~/]/) print$1}' num=$i|sed s'/]//'`
+if [ -z "$dir_name" ];then
+dir_name=none
+fi
+guestok=`cat /etc/samba/smb.conf|sed '/^#.*/'d|awk -v RS="["  'NR==num' num=$i|awk -F= '/guest ok/ {print $2}'|sed s'/[ ][ ]*//'`
+if [ -z "$guestok" ];then
+guestok=No
+fi
+readonly=`cat /etc/samba/smb.conf|sed '/^#.*/'d |awk -v RS="["  'NR==num' num=$i|awk -F= '/read only/ {print $2}'|sed s'/[ ][ ]*//'`
+if [ -z "$readonly" ];then
+readonly=No
+fi
+path=`cat /etc/samba/smb.conf|sed '/^#.*/'d |awk -v RS="["  'NR==num' num=$i|awk -F= '/path/ {print $2}'|sed s'/[ ][ ]*//'`
+if [ -z "$path" ];then
+path=none
+fi
+group=`cat /etc/samba/smb.conf|sed '/^#.*/'d |awk -v RS="["  'NR==num' num=$i|awk -F= '/valid users/ {print $2}'|awk -F, '{for(i=1;i<=NF;i++) if($i~/@/) printf "%s,",$i}'|sed 's/^[ ]*//g'|sed 's/,$//g'` 
+user=`cat /etc/samba/smb.conf|sed '/^#.*/'d |awk -v RS="["  'NR==num' num=$i|awk -F= '/valid users/ {print $2}'|awk -F, '{for(i=1;i<=NF;i++) if($i!~/@/) printf "%s,",$i}'|sed 's/^[ ]*//g'|sed 's/,$//g'`
+if [ -z "$user" ];then
+user=none
+fi
+if [ -z "$group" ];then
+group=none
+fi
+echo "$dir_name;$path;$guestok;$readonly;$group;$user"|awk -F";"  '$6!="none" {print $0}'
+fi
+done

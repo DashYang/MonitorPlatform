@@ -1,0 +1,11 @@
+#!/bin/bash
+user=$1
+password=$2
+useradd $user 
+
+if [ -n "$password" ]; then
+    (echo $password;echo $password)|sudo smbpasswd -s -a $user
+    exit 1
+fi
+
+echo "password can't be null!"

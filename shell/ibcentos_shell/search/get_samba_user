@@ -1,0 +1,6 @@
+#!/bin/bash
+for i in `sudo pdbedit --list 2>/dev/null|grep ":[0-9]"`
+do
+	samba_user=`echo $i|awk -F: '{print $1}'`
+	echo "$samba_user"
+done 

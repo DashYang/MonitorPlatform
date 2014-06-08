@@ -1,0 +1,13 @@
+#!bin/sh
+#node00
+if [ -z "`sh ../search/get_peer_status |awk '{print $1}'|grep node00`" ]; then
+	gluster peer probe node00
+fi
+
+#masternode
+if [ -z "`sh ../search/get_peer_status |awk '{print $1}'|grep dash-Aspire-4741`" ]; then
+	gluster peer probe dash-Aspire-4741
+fi
+#create volume list
+
+echo "node load done"

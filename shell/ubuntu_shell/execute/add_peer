@@ -1,0 +1,11 @@
+#!bin/sh
+node=$1
+if [ -z "`cat /etc/hosts|grep $node`" ]; then
+	echo "no such host!"
+	exit
+fi
+if [ -z "`ping "$node" -c 2|grep Unreachable`" ]; then
+	gluster peer probe "$node"
+	exit 1
+fi
+echo "$node is Unreachable"

@@ -1,0 +1,21 @@
+#!/bin/bash
+dir=`echo "$1]"`
+path=$2
+validusers=$3
+localpath=/root/centos_shell/tmp
+if [ -z  "`grep $dir /etc/samba/smb.conf`" ];then
+		echo "[$dir">>"$localpath"/config/smb.conf.tmp
+	if [ "$path" != "none" ];then
+		echo "  path = $path">>"$localpath"/config/smb.conf.tmp
+	fi
+	if [ "$validusers" != "none" ];then
+		echo "  valid users = $validusers">>"$localpath"/config/smb.conf.tmp
+	fi
+	if [ "$readonly" != "none" ];then
+		echo "  read only = no">>"$localpath"/config/smb.conf.tmp
+	fi
+	echo y|cp /etc/samba/smb.conf "$localpath"/config/smb.conf.bak
+	sudo cat "$localpath"/config/smb.conf.tmp>>/etc/samba/smb.conf
+	sudo rm -rf "$localpath"/config/smb.conf.tmp
+	chown "$validusers" "$path"
+fi

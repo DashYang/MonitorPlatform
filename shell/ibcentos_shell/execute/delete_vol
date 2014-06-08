@@ -1,0 +1,10 @@
+#!bin/sh
+VOL_NAME=$1
+sh umount_vol "$VOL_NAME"
+echo y |gluster volume delete $VOL_NAME >/dev/null 2>/dev/null
+ret=$?
+if [ $ret -ne 0 ];then
+   echo "$VOL_NAME卷删除失败！"
+   exit 1
+fi
+echo "operation success!"

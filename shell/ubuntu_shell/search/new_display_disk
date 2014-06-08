@@ -1,0 +1,16 @@
+#!/bin/bash
+#sudo fdisk -l 2>/dev/null|grep "/dev/sd[a-z][0-9]">/tmp/disk
+hostname=`hostname`
+for disk in `df |grep /dev/sd[a-z]|cut -c6-9`
+do
+if [ -z "`sudo file -s /dev/$disk|grep filesystem`" ];then
+   fstype="unformat"
+else
+   fstype="`sudo file -s /dev/$disk|sed 's/.* \(.*\) filesystem.*/\1/'`"
+fi
+disksize="`df -h|grep $disk|awk '{print $4}'`"
+#wwin="`sudo scsi_id -g /dev/$disk`"
+uuid=`sudo blkid /dev/$disk|grep "ext4"|awk -F\" '{print $2}'`
+used=yes
+echo "$hostname $disk $disksize $uuid $fstype $used"
+done

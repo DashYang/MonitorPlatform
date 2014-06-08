@@ -1,0 +1,9 @@
+#!bin/sh
+NODE=$1
+gluster peer detach $NODE >/dev/null 2>/dev/null
+ret=$?
+if [ $ret -ne 0 ];then
+   echo "delete $NODE failed"
+   exit 1
+fi
+echo "operation success!"

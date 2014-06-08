@@ -1,0 +1,95 @@
+#!/bin/bash
+get_cpu_stat()
+{
+awk -v total=0 '/cpu[^0-9]/ {for(i=2;i<=NF;i++){total+=$i};used=$2+$3+$4+$7+$8 }END{print total,used}' /proc/stat
+}
+
+get_mem_stat()
+{
+awk '/MemTotal/{total=$2}/MemFree/{free=$2}/Buffers/{buffers=$2}/^Cached/{cached=$2}END{printf ("%d,%d",total,total-free-buffers-cached)}'  /proc/meminfo
+}
+
+get_net_stat()
+{
+awk -F: '/eth[2-9]/ {print $2}' /proc/net/dev|awk '{net_rec+=$1;net_trans+=$9} END{print net_trans" "net_rec}'
+}
+
+get_ib_cnt()
+{
+sudo perfquery |sed s'/\.*//g'|awk '$0~/(PortXmitData|PortRcvData)/'|awk -F: '{print $2}'
+}
+get_ipoib_ip()
+{
+ipoib_ip=`cat /etc/sysconfig/network-scripts/ifcfg-ib0|awk -F= '$1=="IPADDR" {print $2}'`
+if [ -n "$ipoib_ip" ];then
+echo $ipoib_ip
+else
+echo none
+fi
+}
+if [ "`ps -ef|grep "get_status"|egrep -v "grep|vi"|wc -l`" -gt "1" ];then
+while [ $(((`date +%s`)%5)) -ne "0" ]
+do
+sleep 1
+done
+time_point=`get_cpu_stat`
+get_net_stat_point=(`get_net_stat`)
+if [ -n "`lsmod|grep ib_core`" ];then
+get_ib_cnt_point=(`get_ib_cnt`)
+if [ "${get_ib_cnt_point[0]}" -gt "4294900000" -o "${get_ib_cnt_point[1]}" -gt "4294900000" ];then
+sudo perfquery -R
+get_ib_cnt_point=(0 0)
+fi
+fi
+while [ 1 ]
+do
+sleep 5
+mem_stat=`get_mem_stat`
+ipoib_ip=`get_ipoib_ip`
+time_point_2=`get_cpu_stat`
+get_net_stat_point2=(`get_net_stat`)
+if [ -z "$get_ib_cnt_point1" ];then
+	if [ -n "`lsmod|grep ib_core`" ];then
+		get_ib_cnt_point2=(`get_ib_cnt`)
+		ib_out=$(((${get_ib_cnt_point2[0]}-${get_ib_cnt_point[0]})*4/5/1024))
+		ib_in=$(((${get_ib_cnt_point2[1]}-${get_ib_cnt_point[1]})*4/5/1024))
+	else
+		ib_out="-1"
+		ib_in="-1"
+	fi
+	net_out=$(((${get_net_stat_point2[0]}-${get_net_stat_point[0]})/5/1024))
+	net_in=$(((${get_net_stat_point2[1]}-${get_net_stat_point[1]})/5/1024))
+	cpu_stat=`echo "$time_point $time_point_2"|awk '{used=$4-$2;total=$3+$4-$1-$2;printf("%.2f\n",used*100/total)}'`
+else
+	if [ -n "`lsmod|grep ib_core`" ];then
+		get_ib_cnt_point2=(`get_ib_cnt`)
+		ib_out=$(((${get_ib_cnt_point2[0]}-${get_ib_cnt_point1[0]})*4/5/1024))
+		ib_in=$(((${get_ib_cnt_point2[1]}-${get_ib_cnt_point1[1]})*4/5/1024))
+	else
+		ib_out="-1"
+		ib_in="-1"
+	fi
+	net_out=$(((${get_net_stat_point2[0]}-${get_net_stat_point1[0]})/5/1024))
+	net_in=$(((${get_net_stat_point2[1]}-${get_net_stat_point1[1]})/5/1024))
+	cpu_stat=`echo "$time_point_1 $time_point_2"|awk '{used=$4-$2;total=$3+$4-$1-$2;printf("%.2f\n",used*100/total)}'`
+fi
+if [ "${get_ib_cnt_point2[0]}" -gt "4294900000" -o "${get_ib_cnt_point2[1]}" -gt "4294900000" ];then
+	sudo perfquery -R
+	get_ib_cnt_point2=(0 0)
+fi
+get_ib_cnt_point1=(${get_ib_cnt_point2[*]})
+time_point_1=$time_point_2
+get_net_stat_point1=(${get_net_stat_point2[*]})
+hostname=`cat /etc/sysconfig/network|awk -F= '$1=="HOSTNAME" {print $2}'`
+var=`date +%F" "%T`
+current_date=`echo $var|cut -c1-10`
+if [ "`echo $var|cut -c19`" -ge 5 ];then
+	date="`echo $var|cut -c1-18`5"
+else
+	date="`echo $var|cut -c1-18`0"
+fi
+sudo touch ./tmp/$current_date.stat
+sudo chmod 777 ./tmp/$current_date.stat
+echo "$date@$hostname,$ipoib_ip,$cpu_stat,$mem_stat,$net_out,$net_in,$ib_out,$ib_in" >> ./tmp/$current_date.stat
+done
+fi

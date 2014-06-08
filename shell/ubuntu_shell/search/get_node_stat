@@ -1,0 +1,66 @@
+#!/bin/bash
+LANGUAGE=en_US.UTF-8
+hostname=`hostname`
+testparm=`sudo gluster peer status 2>/dev/null|grep Connected`
+if [ -z "$testparm" ];then
+node_stat="offline"
+else
+node_stat="online"
+fi
+#if [ -f /etc/sysconfig/network-scripts/ifcfg-bond0 -a -n "`grep IPADDR /etc/sysconfig/network-scripts/ifcfg-bond0 2>/dev/null`" ];then
+#traffic_ip=`cat /etc/sysconfig/network-scripts/ifcfg-bond0|awk -F= '$1=="IPADDR" {print $2}'`
+#elif [ -f /etc/sysconfig/network-scripts/ifcfg-eth2 -a -n "`grep IPADDR /etc/sysconfig/network-scripts/ifcfg-eth2 2>/dev/null`" ];then
+#traffic_ip=`cat /etc/sysconfig/network-scripts/ifcfg-eth2|awk -F= '$1=="IPADDR" {print $2}'`
+#else
+#traffic_ip="none"
+traffic_ip=`ifconfig -a|sed 's/^[ ]*//'|awk  '{print $0}'|awk -v RS="" 'NR==1 {print $0}'|grep "inet.* Bcast.* Mask.*"|awk -F":" '{print $2}'|sed 's/ .*//'`
+#fi
+#if [ -f /etc/sysconfig/network-scripts/ifcfg-eth0 -a -n "`grep IPADDR /etc/sysconfig/network-scripts/ifcfg-eth0 2>/dev/null`" ];then
+#manage_ip=`cat /etc/sysconfig/network-scripts/ifcfg-eth0|awk -F= '$1=="IPADDR" {print $2}'`
+#else
+#manage_ip="none"
+#fi
+manage_ip="$traffic_ip"
+if [ -f /etc/sysconfig/network-scripts/ifcfg-ib0 -a -n "`grep IPADDR /etc/sysconfig/network-scripts/ifcfg-ib0 2>/dev/null`" ];then
+ipoib_ip=`cat /etc/sysconfig/network-scripts/ifcfg-ib0|awk -F= '$1=="IPADDR" {print $2}'`
+else
+ipoib_ip="none"
+fi
+nfs_status=`sudo gluster volume status 2>/dev/null|grep "NFS Server on localhost"|uniq|awk '{print $6}'`
+if [ -z "$nfs_status" ];then
+nfs_status=N
+fi
+
+if [ -n "`status smbd|grep running`" ];then
+	smb_status=Y
+else
+	smb_status=N
+fi
+
+if [ -f /etc/init.d/scst ];then
+	if [ -n "`/etc/init.d/scst status|grep OK`" ];then
+		iscsi_status=Y
+	else
+		iscsi_status=N
+	fi
+else
+	iscsi_status=N
+fi
+
+if [ -f /etc/init.d/ctdb ];then
+	if [ -n "`/etc/init.d/ctdb status|grep stopped`" ];then
+		ctdb_status=N
+	else
+		ctdb_status=Y
+	fi
+else
+	ctdb_status=N
+fi
+
+disk_volume=`sudo fdisk -l|grep /dev/sd[a-z]:|awk '{print $3 $4}'|sed 's/,//g'`
+if [ -n "`/etc/init.d/glusterd status|grep running`" ];then
+unistorage_status=Y
+else
+unistorage_status=N
+fi
+echo "$hostname,$node_stat,$disk_volume,$manage_ip,$traffic_ip,$ipoib_ip,$nfs_status,$smb_status,$ctdb_status,$iscsi_status,$unistorage_status"

@@ -1,0 +1,26 @@
+#!/bin/bash
+gluster volume info>../tmp/gluster.vol.info
+for i in `cat ../tmp/gluster.vol.info|sed 's/^[ ]*//'|awk -v RS="" '{print NR}'`
+do
+volume_name=`cat ../tmp/gluster.vol.info|sed 's/^[ ]*//'|awk -v RS="" 'NR==num' num=$i|awk '/Volume Name/ {print $3}'`
+volume_type=`cat ../tmp/gluster.vol.info|sed 's/^[ ]*//'|awk -v RS="" 'NR==num' num=$i|awk '/Type:/ {print $2}'`
+volume_status=`cat ../tmp/gluster.vol.info|sed 's/^[ ]*//'|awk -v RS="" 'NR==num' num=$i|awk '/Status:/ {print $2}'`
+if [ "$volume_type" = "Distribute" ];then
+REP_FAC=1
+bricks_num=`cat ../tmp/gluster.vol.info|awk -v RS="" 'NR==num {print $11}' num=$i`
+else
+if [ -n "`cat ../tmp/gluster.vol.info|sed 's/^[ ]*//'|awk -v RS="" 'NR==num' num=$i|grep =`" ];then
+        REP_FAC=`cat ../tmp/gluster.vol.info|awk -v RS="" 'NR==num {print $13}' num=$i`
+	bricks_num=`cat ../tmp/gluster.vol.info|awk -v RS="" 'NR==num {print $15}' num=$i`
+else
+	REP_FAC=`cat ../tmp/gluster.vol.info|awk -v RS="" 'NR==num {print $11}' num=$i`
+	bricks_num=`cat ../tmp/gluster.vol.info|awk -v RS="" 'NR==num {print $11}' num=$i`
+fi
+fi
+transport_type=`cat ../tmp/gluster.vol.info|sed 's/^[ ]*//'|awk -v RS="" 'NR==num' num=$i|awk '/Transport-type/ {print $2}'`
+brick_element=`cat ../tmp/gluster.vol.info|sed 's/^[ ]*//'|awk -v RS="" 'NR==num' num=$i|grep Brick[0-9]|awk '{printf $2"#"}'|sed 's/#$//'`
+if [ -n "$volume_name" ];then
+	echo "$volume_name,$volume_type,$transport_type,$volume_status,$bricks_num,$REP_FAC,$brick_element"
+fi
+done
+rm -rf ../tmp/gluster.vol.info

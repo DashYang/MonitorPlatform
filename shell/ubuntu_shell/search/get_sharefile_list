@@ -1,0 +1,3 @@
+#!/bin/sh
+sharepath="`df |grep gluster|awk '{print $6}'`"
+echo "`ls $sharepath`"

@@ -1,0 +1,21 @@
+#!/bin/bash
+sudo fdisk -l 2>/dev/null|grep "/dev/sd[a-z][^0-9]"|grep -v "`fdisk -l 2>/dev/null|grep "/dev/sd[a-z][0-9]"|awk '{print $1}'|sed 's/[0-9]//'|sort -u`"|grep -v "`pvs|grep "/dev/sd"|awk  '{print $1}'|sed 's/[0-9]//'|sort -u`">/tmp/disk
+hostname=`hostname`
+for disk in `sudo cat /tmp/disk|cut -c11-13|sort`
+do
+if [ -z "`sudo file -s /dev/$disk|grep filesystem`" ];then
+   fstype="unformat"
+else
+   fstype="`sudo file -s /dev/$disk|sed 's/.* \(.*\) filesystem.*/\1/'`"
+fi
+disksize="`sudo cat /tmp/disk|grep $disk|awk '{print $3 $4}'|sed 's/,//g'`"
+#wwin="`sudo scsi_id -g /dev/$disk`"
+uuid=`sudo blkid /dev/$disk|awk -F\" '{print $2}'`
+mount_piont=`mount|grep brick|awk '$1==disk {print $3}' disk=/dev/$disk`
+if [ -n "`gluster volume info|grep Brick[0-9]|awk '$2==brick {print $0}'  brick=$hostname:$mount_piont`" ];then
+   used=yes
+else
+   used=no
+fi
+echo "$hostname $disk $disksize $uuid $fstype $used"
+done

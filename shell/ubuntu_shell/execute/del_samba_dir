@@ -1,0 +1,9 @@
+#!/bin/bash
+dir=`echo "$1]"`
+if [ -n  "`grep $dir /etc/samba/smb.conf`" ];then
+	sudo touch /opt/yunqiao/tmp/config/smb.conf.del
+	sudo chmod 777 /opt/yunqiao/tmp/config/smb.conf.del
+	cat /etc/samba/smb.conf|sed  s'/^\[/\n\[/'g|awk -v RS="" '{if($0!~dir) print $0}' dir=$dir>>/opt/yunqiao/tmp/config/smb.conf.del
+	echo y|sudo mv /etc/samba/smb.conf /opt/yunqiao/tmp/config/smb.conf.bak
+	echo y|sudo mv /opt/yunqiao/tmp/config/smb.conf.del /etc/samba/smb.conf
+fi

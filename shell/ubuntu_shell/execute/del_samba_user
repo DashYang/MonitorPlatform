@@ -1,0 +1,10 @@
+#!/bin/bash
+user=$1
+if [ -n "$user" ]; then
+	sudo smbpasswd -x $user 
+	sudo userdel $user
+else
+	echo "username can't be null!"
+fi
+ 
+echo "operation done"

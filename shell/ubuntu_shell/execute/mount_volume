@@ -1,0 +1,9 @@
+#!/bin/bash
+VOL_NAME=$1
+NODE=`hostname`
+if [ ! -d "/gluster/$VOL_NAME" ];then
+        mkdir -p "/gluster/$VOL_NAME"
+fi
+
+mount -t glusterfs "$NODE":"$VOL_NAME" "/gluster/$VOL_NAME"
+echo "mount done"

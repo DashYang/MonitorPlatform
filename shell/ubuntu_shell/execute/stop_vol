@@ -1,0 +1,9 @@
+#!/bin/bash
+VOL_NAME=$1
+echo y|gluster volume stop $VOL_NAME >/dev/null 2>/dev/null
+ret=$?
+if [ $ret -ne 0 ];then
+	echo "stop $VOL_NAME failure！"
+	exit 1
+fi
+echo "operation success!" 

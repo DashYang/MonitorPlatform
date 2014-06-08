@@ -1,0 +1,6 @@
+#bin/sh
+head -n 1 /etc/issue
+cat /proc/cpuinfo |grep model| awk -F":" '{ print $2 }' |sed -n '2p'|sed 's/^[ \t]*//g'
+uname -s
+uname -r
+

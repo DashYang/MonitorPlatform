@@ -1,0 +1,22 @@
+#!/bin/bash
+dir=`echo "$1]"`
+path=$2
+validusers=$3
+touch ../tmp/config/smb.conf.tmp
+touch ../tmp/config/smb.conf.bak
+if [ -z  "`grep $dir /etc/samba/smb.conf`" ];then
+		echo "[$dir">>../tmp/config/smb.conf.tmp
+	if [ "$path" != "none" ];then
+		echo "  path = $path">>../tmp/config/smb.conf.tmp
+	fi
+	if [ "$validusers" != "none" ];then
+		echo "  valid users = $validusers">>../tmp/config/smb.conf.tmp
+	fi
+	if [ "$readonly" != "none" ];then
+		echo "  read only = no">>../tmp/config/smb.conf.tmp
+	fi
+	echo y|cp /etc/samba/smb.conf ../tmp/config/smb.conf.bak
+	sudo cat ../tmp/config/smb.conf.tmp>>/etc/samba/smb.conf
+	sudo rm -rf ../tmp/config/smb.conf.tmp
+	chown "$validusers" "$path"
+fi
